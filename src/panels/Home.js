@@ -3,11 +3,25 @@ import PropTypes from 'prop-types';
 
 import { Panel, PanelHeader, Header, Button, Group, Cell, Div, Avatar, CardGrid, ContentCard, FixedLayout, Separator, WriteBar, WriteBarIcon } from '@vkontakte/vkui';
 
+const Home = ({ id, go, fetchedUser, messages, sendMessage }) => {
+	// локальное состояние для текста сообщения
+	const [text, setText] = useState("")
 
-const Home = ({ id, go, fetchedUser }) => {
+	// обрабатываем изменение текста
+	const handleChangeText = (e) => {
+		setText(e.target.value)
+	}
 
-	const [text, setText] = useState("");
-
+	// обрабатываем отправку сообщения
+	const handleSendMessage = (e) => {
+		e.preventDefault()
+		const trimmed = text.trim()
+		if (trimmed) {
+		  sendMessage({ messageText: text, senderName: username })
+		  setText('')
+		}
+	}
+	
 	return (
 		<Panel id={id}>
 			<PanelHeader>Чатик</PanelHeader>
@@ -32,20 +46,14 @@ const Home = ({ id, go, fetchedUser }) => {
 
 			<Group>
 				<CardGrid size="l">
-					<ContentCard
-						subtitle="VKUI"
-						header="ContentCard example"
-						caption="VKUI Styleguide > Blocks > ContentCard"
-					/>
-					<ContentCard
-						onClick={() => {}}
-						src="https://images.unsplash.com/photo-1603988492906-4fb0fb251cf8?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1600&q=80"
-						subtitle="unsplash"
-						header="brown and gray mountains under blue sky during daytime photo"
-						text="Mountain changji"
-						caption="Photo by Siyuan on Unsplash"
-						maxHeight={150}
-					/>
+					{messages.map((msg) => (
+						<ContentCard
+							src={msg.avatar}
+							header={msg.senderName}
+							text={msg.messageText}
+							caption={msg.createdAt}
+						/>
+					))}
 				</CardGrid>
 			</Group>
 
@@ -56,12 +64,12 @@ const Home = ({ id, go, fetchedUser }) => {
 						<Fragment>
 							{<WriteBarIcon 
 								mode="send" 
-								onClick={() => console.log('send')}
-								/>}
+								onClick={handleSendMessage}
+							/>}
 						</Fragment>
 					}
 					value={text}
-					onChange={(e) => setText(e.target.value)}
+					onChange={handleChangeText}
 					placeholder="Сообщение"
 				/>
         	</FixedLayout>
