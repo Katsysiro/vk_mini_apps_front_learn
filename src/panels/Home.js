@@ -17,8 +17,11 @@ const Home = ({ id, go, fetchedUser, messages, sendMessage }) => {
 		e.preventDefault()
 		const trimmed = text.trim()
 		if (trimmed) {
-		  sendMessage({ messageText: text, senderName: username })
-		  setText('')
+		  	sendMessage({ 
+			  messageText: text, 
+			  senderName: `${fetchedUser.first_name} ${fetchedUser.last_name}` 
+			})
+		  	setText('')
 		}
 	}
 	
@@ -45,9 +48,11 @@ const Home = ({ id, go, fetchedUser, messages, sendMessage }) => {
 			</Group>*/}
 
 			<Group>
-				<CardGrid size="l">
+				<CardGrid size="l" 
+					style={{marginBottom:54}}>
 					{messages.map((msg) => (
 						<ContentCard
+							key={msg.messageId}
 							src={msg.avatar}
 							header={msg.senderName}
 							text={msg.messageText}

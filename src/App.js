@@ -25,9 +25,7 @@ const App = () => {
   	// но и для хранения любых мутирующих значений в течение всего жизненного цикла компонента
   	const socket = useRef(null)
 
-	useEffect(() => {
-		console.log('useEffect App')
-
+	useEffect(async () => {
 		bridge.subscribe(({ detail: { type, data }}) => {
 			if (type === 'VKWebAppUpdateConfig') {
 				const schemeAttribute = document.createAttribute('scheme');
@@ -35,36 +33,33 @@ const App = () => {
 				document.body.attributes.setNamedItem(schemeAttribute);
 			}
 		});
+
+		let user = null
+		
 		async function fetchData() {
-			const user = await bridge.send('VKWebAppGetUserInfo');
+			user = await bridge.send('VKWebAppGetUserInfo');
 			setUser(user);
 			setPopout(null);
 
+			// создаем экземпляр сокета, передаем ему адрес сервера
+			// и записываем объект с названием комнаты в строку запроса "рукопожатия"
+			// socket.handshake.query.roomId
+			socket.current = io(SERVER_URL)
 
-		// отправляем запрос на получение сообщений
-		socket.current.emit('message:get')
+			// отправляем запрос на получение сообщений
+			socket.current.emit('message:get')
 		}
-		fetchData();
-		
-		// создаем экземпляр сокета, передаем ему адрес сервера
-		// и записываем объект с названием комнаты в строку запроса "рукопожатия"
-		// socket.handshake.query.roomId
-		socket.current = io(SERVER_URL)
-		
+
+		await fetchData();
 
 		// обрабатываем получение сообщений
 		socket.current.on('messages', (messages) => {
-			console.log('on messages')
-			console.log(messages)
-
-			console.log(fetchedUser)
-
 			// определяем, какие сообщения были отправлены данным пользователем,
 			// если значение свойства "userId" объекта сообщения совпадает с id пользователя,
 			// то добавляем в объект сообщения свойство "currentUser" со значением "true",
 			// иначе, просто возвращаем объект сообщения
 			const newMessages = messages.map((msg) =>
-			  msg.userId === fetchedUser.id ? { ...msg, currentUser: true } : msg
+			  msg.userId === user.id ? { ...msg, currentUser: true } : msg
 			)
 			// обновляем массив сообщений
 			setMessages(newMessages)
@@ -85,7 +80,7 @@ const App = () => {
 	const sendMessage = ({ messageText, senderName }) => {
 		// добавляем в объект id пользователя при отправке на сервер
 		socket.current.emit('message:add', {
-			userId,
+			userId: fetchedUser.id,
 			messageText,
 			senderName
 		})
@@ -95,8 +90,17 @@ const App = () => {
 		<AdaptivityProvider>
 			<AppRoot>
 				<View activePanel={activePanel} popout={popout}>
-					<Home id='home' fetchedUser={fetchedUser} go={go} messages={messages} sendMessage={sendMessage}/>
-					<Persik id='persik' go={go} />
+					<Home 
+						id='home' 
+						fetchedUser={fetchedUser} 
+						go={go} 
+						messages={messages} 
+						sendMessage={sendMessage}
+					/>
+					<Persik 
+						id='persik' 
+						go={go} 
+					/>
 				</View>
 			</AppRoot>
 		</AdaptivityProvider>
