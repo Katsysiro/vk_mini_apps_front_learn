@@ -19,7 +19,7 @@ const App = () => {
 
 	// адрес сервера
 	// требуется перенаправление запросов - смотрите ниже
-	const SERVER_URL = 'http://localhost:5000'
+	const SERVER_URL = 'https://5.188.141.101:5000'
 
 	// useRef() используется не только для получения доступа к DOM-элементам,
   	// но и для хранения любых мутирующих значений в течение всего жизненного цикла компонента
@@ -79,10 +79,14 @@ const App = () => {
 	// принимает объект с текстом сообщения и именем отправителя
 	const sendMessage = ({ messageText, senderName }) => {
 		// добавляем в объект id пользователя при отправке на сервер
+		
+		console.log(fetchedUser)
+
 		socket.current.emit('message:add', {
 			userId: fetchedUser.id,
 			messageText,
-			senderName
+			senderName,
+			avatar: fetchedUser.photo_200
 		})
 	}
 
