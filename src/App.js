@@ -1,13 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
 import bridge from '@vkontakte/vk-bridge';
 import { View, ScreenSpinner, AdaptivityProvider, AppRoot } from '@vkontakte/vkui';
-import '@vkontakte/vkui/dist/vkui.css';
+import '@vkontakte/vkui/dist/vkui.css'
 
 // получаем класс IO
 import io from 'socket.io-client'
 
-import Home from './panels/Home';
-import Persik from './panels/Persik';
+import Home from './panels/Home'
+import Chat from './panels/Chat'
+import Persik from './panels/Persik'
+import Race from './panels/Race'
 
 const App = () => {
 	const [activePanel, setActivePanel] = useState('home');
@@ -44,16 +46,16 @@ const App = () => {
 			// создаем экземпляр сокета, передаем ему адрес сервера
 			// и записываем объект с названием комнаты в строку запроса "рукопожатия"
 			// socket.handshake.query.roomId
-			socket.current = io(SERVER_URL)
+			/*socket.current = io(SERVER_URL)
 
 			// отправляем запрос на получение сообщений
-			socket.current.emit('message:get')
+			socket.current.emit('message:get')*/
 		}
 
 		await fetchData();
 
 		// обрабатываем получение сообщений
-		socket.current.on('messages', (messages) => {
+		/*socket.current.on('messages', (messages) => {
 			// определяем, какие сообщения были отправлены данным пользователем,
 			// если значение свойства "userId" объекта сообщения совпадает с id пользователя,
 			// то добавляем в объект сообщения свойство "currentUser" со значением "true",
@@ -63,11 +65,11 @@ const App = () => {
 			)
 			// обновляем массив сообщений
 			setMessages(newMessages)
-		})
+		})*/
 
 		return () => {
-		  // при размонтировании компонента выполняем отключение сокета
-		  socket.current.disconnect()
+		  	// при размонтировании компонента выполняем отключение сокета
+		  	//socket.current.disconnect()
 		}
 	}, []);
 
@@ -100,6 +102,17 @@ const App = () => {
 						go={go} 
 						messages={messages} 
 						sendMessage={sendMessage}
+					/>
+					<Chat 
+						id='chat' 
+						fetchedUser={fetchedUser} 
+						go={go} 
+						messages={messages} 
+						sendMessage={sendMessage}
+					/>
+					<Race 
+						id='race' 
+						go={go} 
 					/>
 					<Persik 
 						id='persik' 
