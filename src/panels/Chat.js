@@ -1,11 +1,24 @@
-import React, { useState, useEffect, useRef, Fragment } from 'react';
-import PropTypes from 'prop-types';
+import React, { useState, useEffect, useRef, Fragment } from 'react'
+import PropTypes from 'prop-types'
+import { Panel, PanelHeader, PanelHeaderBack, Group, Avatar, CardGrid, ContentCard, FixedLayout, Separator, WriteBar, WriteBarIcon } from '@vkontakte/vkui'
 
-import { Panel, PanelHeader, PanelHeaderBack, Button, Group, Cell, Div, Avatar, CardGrid, ContentCard, FixedLayout, Separator, WriteBar, WriteBarIcon } from '@vkontakte/vkui';
-
-const Chat = ({ id, go, fetchedUser, messages, sendMessage }) => {
+const Chat = ({ id, go, fetchedUser, socket }) => {
+	// локальное состояние для сообщений
+	const [messages, setMessages] = useState([])
 	// локальное состояние для текста сообщения
 	const [text, setText] = useState("")
+
+	// функция отправки сообщения
+	// принимает объект с текстом сообщения и именем отправителя
+	const sendMessage = ({ messageText, senderName }) => {
+		// добавляем в объект id пользователя при отправке на сервер
+		socket.emit('message:add', {
+			userId: fetchedUser.id,
+			messageText,
+			senderName,
+			avatar: fetchedUser.photo_200
+		})
+	}
 
 	// обрабатываем изменение текста
 	const handleChangeText = (e) => {
@@ -24,33 +37,29 @@ const Chat = ({ id, go, fetchedUser, messages, sendMessage }) => {
 		  	setText('')
 		}
 	}
+
+	socket.on('messages', (messages) => {
+		// определяем, какие сообщения были отправлены данным пользователем,
+		// если значение свойства "userId" объекта сообщения совпадает с id пользователя,
+		// то добавляем в объект сообщения свойство "currentUser" со значением "true",
+		// иначе, просто возвращаем объект сообщения
+		const newMessages = messages.map((msg) =>
+		  	msg.userId === fetchedUser.id ? { ...msg, currentUser: true } : msg
+		)
+		// обновляем массив сообщений
+		setMessages(newMessages)
+	})
 	
 	return (
 		<Panel id={id}>
 			<PanelHeader
 				left={<PanelHeaderBack onClick={go} data-to="home"/>}
-			>Чатик</PanelHeader>
-
-			{/*fetchedUser &&
-			<Group header={<Header mode="secondary">User Data Fetched with VK Bridge</Header>}>
-				<Cell
-					before={fetchedUser.photo_200 ? <Avatar src={fetchedUser.photo_200}/> : null}
-					description={fetchedUser.city && fetchedUser.city.title ? fetchedUser.city.title : ''}
-				>
-					{`${fetchedUser.first_name} ${fetchedUser.last_name}`}
-				</Cell>
-			</Group>*/}
-
-			{/*<Group header={<Header mode="secondary">Navigation Example</Header>}>
-				<Div>
-					<Button stretched size="l" mode="secondary" onClick={go} data-to="persik">
-						Show me the Persik, please
-					</Button>
-				</Div>
-			</Group>*/}
-
+			>
+				Чатик
+			</PanelHeader>
+			
 			<Group>
-			<CardGrid size="l" 
+				<CardGrid size="l" 
 					style={{marginBottom:54}}>
 					{messages.map((msg) => (
 						<ContentCard
@@ -89,7 +98,7 @@ const Chat = ({ id, go, fetchedUser, messages, sendMessage }) => {
 			
 		</Panel>
 	)
-};
+}
 
 Chat.propTypes = {
 	id: PropTypes.string.isRequired,
@@ -102,6 +111,6 @@ Chat.propTypes = {
 			title: PropTypes.string,
 		}),
 	}),
-};
+}
 
-export default Chat;
+export default Chat

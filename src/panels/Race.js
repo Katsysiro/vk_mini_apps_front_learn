@@ -1,18 +1,19 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import React from 'react'
+import PropTypes from 'prop-types'
+import { usePlatform, getClassName } from "@vkontakte/vkui"
+import { Panel, PanelHeader, PanelHeaderBack, Div } from '@vkontakte/vkui'
 
-import { Panel, PanelHeader, PanelHeaderBack, Div } from '@vkontakte/vkui';
+import useWindowDimensions from './hooks/useWindowDimensions'
 
 import Phaser from 'phaser'
 import { IonPhaser } from '@ion-phaser/react'
-
 import { Joystick } from 'react-joystick-component'
-
-import useWindowDimensions from './hooks/useWindowDimensions';
 
 import Game from './Race/state/Game'
 
 const Race = ({ id, go }) => {
+	const platform = usePlatform()
+	console.log(platform)
 
 	const { height, width } = useWindowDimensions()
 
@@ -43,13 +44,13 @@ const Race = ({ id, go }) => {
         //setManualTiltAngle([stick.y, stick.x]);
 		//console.log(stick)
 		stickState = stick
-    };
+    }
 
     const onStop = () => {
         //setManualTiltAngle([0, 0]);
-		stickState.y = 0;
-		stickState.x = 0;
-    };
+		stickState.y = 0
+		stickState.x = 0
+    }
 
 	const { initialize, game } = state
 
@@ -89,6 +90,6 @@ const Race = ({ id, go }) => {
 Race.propTypes = {
 	id: PropTypes.string.isRequired,
 	go: PropTypes.func.isRequired,
-};
+}
 
-export default Race;
+export default Race

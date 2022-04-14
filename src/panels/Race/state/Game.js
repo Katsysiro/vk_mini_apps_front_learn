@@ -32,14 +32,14 @@ class Game extends Phaser.Scene {
         // socket = io(SERVER_IP)
         // Creates the player passing the X, Y, game and socket as arguments
         this.player = player(Math.random() * width, Math.random() * height / 2, this, socket)
-        // // Creates the player name text
+        // Creates the player name text
         //this.player.playerName = createText(this.game, this.player.sprite.body)
-        // // Creates the player speed text
+        // Creates the player speed text
         //this.player.speedText = createText(this.game, this.player.sprite.body)
 
-        // // Sends a new-player event to the server
+        //  Sends a new-player event to the server
         // newPlayer(socket, this.player)
-        // // update all players
+        // update all players
         // updatePlayers(socket, otherPlayers, this.game)
 
         this.cameras.main.setBounds(0, 0, width, height)
@@ -48,7 +48,7 @@ class Game extends Phaser.Scene {
 
     update () {
         this.player.drive(this)
-        // // Interpolates the players movement
+        // Interpolates the players movement
         // playerMovementInterpolation(otherPlayers)
     }
 }
